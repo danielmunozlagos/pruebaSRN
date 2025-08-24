@@ -17,7 +17,7 @@ Este proyecto utiliza **CodeIgniter 4** y se ejecuta en un entorno **Dockerizado
 ```bash
 # 1. Clonar el repositorio
 git clone https://github.com/danielmunozlagos/pruebaSRN.git
-cd tu_repositorio
+cd pruebaSRN
 
 # 2. Crear archivo .env a partir del archivo base
 cp env .env
@@ -40,7 +40,7 @@ docker exec -it mysql_db mysql -u root -p
 # EXIT;
 
 # 6. Instalar dependencias y ejecutar migraciones
-docker exec -it app bash
+docker exec -it codeigniter_app bash
 composer install
 php spark migrate
 ```
@@ -60,8 +60,16 @@ http://localhost:8080
 ## 🧪 Ejecutar pruebas unitarias
 
 ```bash
-# Dentro del contenedor de la app
+# 1. Acceder al contenedor de la aplicación
+docker exec -it codeigniter_app bash
+
+# 2. Generar archivo phpunit.xml a partir del de ejemplo
+cp phpunit.xml.dist phpunit.xml
+
+# 3. Ejecutar migraciones para entorno de pruebas
 php spark migrate -n tests
+
+# 4. Ejecutar las pruebas
 vendor/bin/phpunit
 ```
 
@@ -76,7 +84,7 @@ En algunos sistemas (especialmente Linux), al levantar los contenedores pueden g
 Dentro del contenedor de la aplicación:
 
 ```bash
-docker exec -it app bash
+docker exec -it codeigniter_app bash
 chown -R www-data:www-data writable/
 chown -R www-data:www-data vendor/
 ```
@@ -92,7 +100,6 @@ chmod -R 777 vendor/
 
 ---
 
-
 ## 📁 Estructura del Proyecto (Resumen)
 
 ```
@@ -103,6 +110,8 @@ chmod -R 777 vendor/
 ├── docker-compose.yml
 ├── Dockerfile
 ├── README.md
+├── phpunit.xml.dist
+├── phpunit.xml
 └── ...
 ```
 
