@@ -66,10 +66,13 @@ docker exec -it codeigniter_app bash
 # 2. Generar archivo phpunit.xml a partir del de ejemplo
 cp phpunit.xml.dist phpunit.xml
 
-# 3. Ejecutar migraciones para entorno de pruebas
+# 3. Verificar que el directorio este bajo el dominio de www-data
+chown -R www-data: .
+
+# 4. Ejecutar migraciones para entorno de pruebas
 php spark migrate -n tests
 
-# 4. Ejecutar las pruebas
+# 5. Ejecutar las pruebas
 vendor/bin/phpunit
 ```
 
