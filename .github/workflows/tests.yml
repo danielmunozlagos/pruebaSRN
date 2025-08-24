@@ -1,0 +1,45 @@
+name: CI - PHPUnit Tests
+
+on:
+  pull_request:
+    branches: [ "develop", "main" ]
+
+jobs:
+  php-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: rootpass
+          MYSQL_DATABASE: codeigniter_db
+          MYSQL_USER: ci_user
+          MYSQL_PASSWORD: ci_pass
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          extensions: pdo_mysql, mysqli, intl, zip
+          coverage: xdebug
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Run migrations
+        run: php spark migrate --all
+
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit --testdox
