@@ -162,72 +162,43 @@ class Database extends Config
      *
      * @var array<string, mixed>
      */
-    // public array $tests = [
-    //     'DSN'         => '',
-    //     'hostname'    => '127.0.0.1',
-    //     'username'    => '',
-    //     'password'    => '',
-    //     'database'    => ':memory:',
-    //     'DBDriver'    => 'SQLite3',
-    //     'DBPrefix'    => 'db_',  // Needed to ensure we're working correctly with prefixes live. DO NOT REMOVE FOR CI DEVS
-    //     'pConnect'    => false,
-    //     'DBDebug'     => true,
-    //     'charset'     => 'utf8',
-    //     'DBCollat'    => '',
-    //     'swapPre'     => '',
-    //     'encrypt'     => false,
-    //     'compress'    => false,
-    //     'strictOn'    => false,
-    //     'failover'    => [],
-    //     'port'        => 3306,
-    //     'foreignKeys' => true,
-    //     'busyTimeout' => 1000,
-    //     'dateFormat'  => [
-    //         'date'     => 'Y-m-d',
-    //         'datetime' => 'Y-m-d H:i:s',
-    //         'time'     => 'H:i:s',
-    //     ],
-    // ];
-    public $tests = [];
+    public array $tests = [
+        'DSN'         => '',
+        'hostname'    => '127.0.0.1',
+        'username'    => '',
+        'password'    => '',
+        'database'    => ':memory:',
+        'DBDriver'    => 'SQLite3',
+        'DBPrefix'    => 'db_',  // Needed to ensure we're working correctly with prefixes live. DO NOT REMOVE FOR CI DEVS
+        'pConnect'    => false,
+        'DBDebug'     => true,
+        'charset'     => 'utf8',
+        'DBCollat'    => '',
+        'swapPre'     => '',
+        'encrypt'     => false,
+        'compress'    => false,
+        'strictOn'    => false,
+        'failover'    => [],
+        'port'        => 3306,
+        'foreignKeys' => true,
+        'busyTimeout' => 1000,
+        'dateFormat'  => [
+            'date'     => 'Y-m-d',
+            'datetime' => 'Y-m-d H:i:s',
+            'time'     => 'H:i:s',
+        ],
+    ];
+    
 
     public function __construct()
     {
         parent::__construct();
 
+        // Ensure that we always set the database group to 'tests' if
+        // we are currently running an automated test suite, so that
+        // we don't overwrite live data on accident.
         if (ENVIRONMENT === 'testing') {
             $this->defaultGroup = 'tests';
-
-            $this->tests = [
-                'DSN'      => '',
-                'hostname' => getenv('database.tests.hostname') ?: '127.0.0.1',
-                'username' => getenv('database.tests.username') ?: 'root',
-                'password' => getenv('database.tests.password') ?: 'rootpass',
-                'database' => getenv('database.tests.database') ?: 'codeigniter_test_db',
-                'DBDriver' => getenv('database.tests.DBDriver') ?: 'MySQLi',
-                'DBPrefix' => '',
-                'pConnect' => false,
-                'DBDebug'  => true,
-                'charset'  => 'utf8',
-                'DBCollat' => 'utf8_general_ci',
-                'swapPre'  => '',
-                'encrypt'  => false,
-                'compress' => false,
-                'strictOn' => false,
-                'failover' => [],
-                'port'     => 3306,
-            ];
         }
     }
-
-    // public function __construct()
-    // {
-    //     parent::__construct();
-
-    //     // Ensure that we always set the database group to 'tests' if
-    //     // we are currently running an automated test suite, so that
-    //     // we don't overwrite live data on accident.
-    //     if (ENVIRONMENT === 'testing') {
-    //         $this->defaultGroup = 'tests';
-    //     }
-    // }
 }
