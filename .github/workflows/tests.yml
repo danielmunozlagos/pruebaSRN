@@ -1,45 +1,66 @@
-name: CI - PHPUnit Tests
+name: tests
 
 on:
+  push:
   pull_request:
     branches: [ "develop", "main" ]
 
 jobs:
-  php-tests:
+  phpunit:
     runs-on: ubuntu-latest
-
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: rootpass
-          MYSQL_DATABASE: codeigniter_db
-          MYSQL_USER: ci_user
-          MYSQL_PASSWORD: ci_pass
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+    env:
+      CI_ENVIRONMENT: testing   # asegura entorno de pruebas
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up PHP
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
-          extensions: pdo_mysql, mysqli, intl, zip
+          php-version: '8.1'   # ajusta si quieres matriz 8.1/8.2/8.3
+          extensions: mbstring, intl, sqlite3, pdo_sqlite, dom, curl
           coverage: xdebug
 
-      - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor
+            ~/.cache/composer
+          key: composer-${{ runner.os }}-php-8.1-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-php-8.1-
 
-      - name: Run migrations
-        run: php spark migrate --all
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Run PHPUnit tests
-        run: vendor/bin/phpunit --testdox
+      - name: Load test env (.env.testing -> .env)
+        run: |
+          if [ -f .env.testing ]; then
+            cp .env.testing .env
+            echo "Usando .env.testing"
+          else
+            echo "Falta .env.testing en el repo" >&2
+            exit 1
+          fi
+
+      # No migrar por CLI: DatabaseTestTrait se encarga en los tests
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit --colors=always
+
+      # Artefactos opcionales (cobertura y reportes)
+      - name: Upload coverage (HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: build/logs/html
+
+      - name: Upload junit & testdox
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phpunit-logs
+          path: |
+            build/logs/logfile.xml
+            build/logs/testdox.*
