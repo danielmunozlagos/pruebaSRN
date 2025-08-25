@@ -5,55 +5,36 @@ namespace App\Models;
 use CodeIgniter\Model;
 
 /**
- * Modelo TaskModel
+ * Modelo de Tareas.
  *
- * Administra la tabla `tasks` para operaciones CRUD.
+ * Campos:
+ *  - id (int, PK, autoincrement)
+ *  - title (string, 3..255)
+ *  - completed (tinyint 0|1)
+ *  - created_at, updated_at (timestamps)
  */
 class TaskModel extends Model
 {
-    /**
-     * @var string Nombre de la tabla
-     */
-    protected $table = 'tasks';
-
-    /**
-     * @var string Clave primaria
-     */
-    protected $primaryKey = 'id';
-
-    /**
-     * @var array Campos permitidos para inserción/actualización masiva
-     */
+    protected $table         = 'tasks';
+    protected $primaryKey    = 'id';
     protected $allowedFields = ['title', 'completed'];
-
-    /**
-     * @var string Tipo de dato que retorna el modelo (array, object, etc.)
-     */
-    protected $returnType = 'array';
-
-    /**
-     * @var bool Habilita la gestión automática de timestamps
-     */
     protected $useTimestamps = true;
 
-    /**
-     * @var string Nombre del campo de creación automática
-     */
-    protected $createdField = 'created_at';
-    
-    /**
-     * @var string Nombre del campo de actualización automática (opcional)
-     */
-    protected $updatedField = 'updated_at'; // Se usa por defecto en CI, es buena práctica mantenerlo
-
-    /**
-     * Reglas de validación para los datos del modelo.
-     * * 'title' debe tener entre 3 y 255 caracteres.
-     * 'completed' debe ser booleano y es opcional para la validación.
-     */
+    /** @var array<string,string> Reglas de validación del modelo */
     protected $validationRules = [
-        'title'     => 'required|min_length[3]|max_length[255]',
+        'title'     => 'required|string|min_length[3]|max_length[255]',
         'completed' => 'permit_empty|in_list[0,1]',
+    ];
 
+    /** @var array<string,array<string,string>> Mensajes de validación */
+    protected $validationMessages = [
+        'title' => [
+            'required'   => 'El título es obligatorio.',
+            'min_length' => 'Mínimo 3 caracteres.',
+            'max_length' => 'Máximo 255 caracteres.',
+        ],
+        'completed' => [
+            'in_list' => 'completed debe ser 0 o 1.',
+        ],
     ];
 }
