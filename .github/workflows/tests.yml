@@ -9,7 +9,7 @@ jobs:
   phpunit:
     runs-on: ubuntu-latest
     env:
-      CI_ENVIRONMENT: testing   # asegura entorno de pruebas
+      CI_ENVIRONMENT: testing 
 
     steps:
       - uses: actions/checkout@v4
@@ -17,7 +17,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'   # ajusta si quieres matriz 8.1/8.2/8.3
+          php-version: '8.1' 
           extensions: mbstring, intl, sqlite3, pdo_sqlite, dom, curl
           coverage: xdebug
 
@@ -43,12 +43,9 @@ jobs:
             echo "Falta .env.testing en el repo" >&2
             exit 1
           fi
-
-      # No migrar por CLI: DatabaseTestTrait se encarga en los tests
       - name: Run PHPUnit
         run: vendor/bin/phpunit --colors=always
 
-      # Artefactos opcionales (cobertura y reportes)
       - name: Upload coverage (HTML)
         if: always()
         uses: actions/upload-artifact@v4
